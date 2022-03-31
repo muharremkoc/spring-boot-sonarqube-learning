@@ -1,0 +1,53 @@
+version: "2"
+
+services:
+
+
+  sonar:
+    image: sonarqube:7.5-community
+    ports:
+      - "9000:9000"
+    networks:
+      - sonarnet
+    depends_on:
+      - postgresql
+    environment:
+      - SONAR.JDBC.URL=jdbc:postgresql://postgresql:5432/drinkDB
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+  postgresql:
+    container_name: sonardb
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=drinkDB
+#    volumes:
+#      - postgresql:/var/lib/postgresql
+#      # This needs explicit mapping due to https://github.com/docker-library/postgres/blob/4e48e3228a30763913ece952c611e5e9b95c8759/Dockerfile.template#L52
+#      - postgresql_data:/var/lib/postgresql/data
+
+  pgadmin:
+      container_name: sonarpgadmin
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@admin.com
+        PGADMIN_DEFAULT_PASSWORD: root
+      ports:
+        - "5050:80"
+
+networks:
+  sonarnet:
+    driver: bridge
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+#  postgresql:
+#  postgresql_data:
